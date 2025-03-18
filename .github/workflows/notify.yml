@@ -3,6 +3,7 @@ name: Notify on Quality Gate Failure
 on:
   repository_dispatch:
     types: [QualityGateFailure]
+  workflow_dispatch:
 
 jobs:
   notify:
