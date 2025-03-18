@@ -1,0 +1,23 @@
+name: Notify on Quality Gate Failure
+
+on:
+  repository_dispatch:
+    types: [QualityGateFailure]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Send SNS Notification
+        run: |
+          aws sns publish \
+            --topic-arn ${{ secrets.AWS_SNS_TOPIC_ARN }} \
+            --message "🚨 SonarQube Quality Gate Failed! Check SonarQube for details: https://your-sonarqube-url.com" \
+            --subject "SonarQube Quality Gate Failure"
