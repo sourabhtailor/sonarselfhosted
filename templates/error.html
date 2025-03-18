@@ -1,0 +1,19 @@
+{% set title = "Error" %}{% extends "base.html" %}  {% block content %}
+
+<h2>Problem: an error occurred</h2>
+<p>Error information:</p>
+
+{% if error_code %}
+<p>{{ error_code | raw }} {{ error_message | raw  }}</p>
+
+{% if fixing_instructions != null %}
+    <p>{{ fixing_instructions | raw }} </p>
+{% endif %}
+{% else %}
+<p><pre>{{ err }}</pre></p>
+{% endif %}
+
+
+<p><a href="{{ app_url }}">{{ common_texts["ContinueButton"] | raw }}</a></p>
+
+{% endblock %}

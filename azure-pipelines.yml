@@ -1,0 +1,133 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+resources:
+  repositories:
+  - repository: launcher-automation
+    type: github
+    name: docusign/launcher-automation
+    ref: main
+    endpoint: launcherAutomationServiceConnection
+
+pr:
+- master
+- releases/*
+
+pool:
+  name: launcher-automation-pool
+
+steps:
+- script: |
+    sudo rm -rf $(Build.SourcesDirectory)/code-examples-php-private
+  displayName: 'Remove Project Folder'
+- checkout: self
+- checkout: launcher-automation
+
+- script: dir $(Build.SourcesDirectory)
+
+- script: |
+    allure –-version
+    java --version
+    javac --version
+    mvn --version
+    docker --version
+
+- task: DownloadSecureFile@1
+  name: tests_config_properties
+  displayName: 'download config.properties'
+  inputs:
+    secureFile: 'php.config.properties'
+
+
+- script: |
+    echo "place config.properties"
+    echo $(tests_config_properties.secureFilePath)
+    cp $(tests_config_properties.secureFilePath) launcher-automation/src/main/resources/config.properties
+  displayName: 'place config.properties'
+
+- task: DownloadSecureFile@1
+  name: php_ds_config
+  displayName: 'download ds_config.php'
+  inputs:
+    secureFile: 'php.ds_config.php'
+
+
+- script: |
+    echo "place ds_config.php"
+    cp $(php_ds_config.secureFilePath) code-examples-php-private/ds_config.php
+  displayName: 'place ds_config.php'
+
+
+- task: DownloadSecureFile@1
+  name: php_private_key
+  displayName: 'download private.key'
+  inputs:
+    secureFile: 'private.key'
+
+
+- script: |
+    echo "place private.key"
+    cp $(php_private_key.secureFilePath) code-examples-php-private/private.key
+  displayName: 'place private.key'
+
+- task: DownloadSecureFile@1
+  name: php_dockerfile
+  displayName: 'download Dockerfile'
+  inputs:
+    secureFile: 'php.Dockerfile'
+
+
+- script: |
+    echo "place Dockerfile"
+    cp $(php_dockerfile.secureFilePath) code-examples-php-private/Dockerfile
+  displayName: 'place Dockerfile'
+
+- script: dir $(Build.SourcesDirectory)
+
+- script: dir $(Build.SourcesDirectory)/code-examples-php-private
+
+- script: |
+    echo "Checking for running Docker containers..."
+    containers=$(docker ps -q)
+    if [ ! -z "$containers" ]; then
+      echo "Stopping running Docker containers..."
+      docker stop $(docker ps -q)
+    else
+      echo "No Docker containers are running."
+    fi
+  displayName: "check for running containers"
+
+- script: |
+    echo "kill and remove any running containers"
+    docker rm -f $(docker ps -a -q)
+    docker system prune -f
+  displayName: 'cleanup docker env'
+
+- script: |
+    cd code-examples-php-private
+    docker compose up -d --build
+  displayName: 'start php app'
+
+- script: |
+    cd code-examples-php-private
+    docker exec docusign-php-fpm composer install
+  displayName: 'install dependencies'
+
+- script: |
+    cd launcher-automation
+    mvn clean test -DsuiteXmlFile="php_suite.xml"
+  displayName: 'php app tests'
+
+- script: |
+    docker stop $(docker ps -a -q)
+    docker rm $(docker ps -a -q)
+  displayName: 'stop php app'
+
+- script: |
+    allure generate --clean --output $(Build.SourcesDirectory)/php-allure-output '$(Build.SourcesDirectory)/launcher-automation/target/allure-results'
+  displayName: generate allure html reports
+- task: PublishAllureReport@1
+  displayName: 'Publish Allure Report'
+  inputs:
+    reportDir: '$(Build.SourcesDirectory)/php-allure-output'

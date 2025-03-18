@@ -1,0 +1,51 @@
+# CMake
+cmake-build-*/
+
+# IntelliJ
+out/
+
+# JIRA plugin
+atlassian-ide-plugin.xml
+
+# Crashlytics plugin (for Android Studio and IntelliJ)
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+
+# ignore IDE/hidden/OS cache files
+.*
+*~
+nbproject
+nb-configuration.xml
+Session.vim
+*.tmproj
+*.tmproject
+tmtags
+Thumbs.db
+Desktop.ini
+
+# add exception for workflow folder
+!.github
+
+# ignore Composer downloads
+/vendor/*
+/Quick_ACG/vendor/*
+
+# keep some hiddens
+!.htaccess
+!/.gitignore
+!/.travis.yml
+
+# ignore twig cache
+/templates/twig_cache/*
+
+# do not check in secrets
+ds_config.php
+private.key
+debug.log
+public/demo_documents/ExportedUserData.csv
+JWTConsoleApp/vendor/*
+JWTConsoleApp/ds_config_jwt_mini.php
+Quick_ACG/vendor/*
+public/demo_documents/web-form-config.json

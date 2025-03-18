@@ -1,0 +1,44 @@
+{% extends "base.html" %} {% block content %}
+
+
+<h2>{{ h1 }}</h2>
+<p>{{ message | raw }}</p>
+
+{% if json %}
+<!-- Data from the server -->
+<div id="server_json_data" data-server-json-data='{"json": {{ json | raw }} }' class="hidden"></div>
+<p>
+<pre class="json-display"><code id="json-display"></code></pre>
+</p>
+
+{% endif %}
+
+
+
+{% if url %}
+<iframe width="1000" height="800" src="{{ url }}"></iframe> 
+
+{% endif %}
+
+
+{% if import_id == "refreshPage" %}
+
+{# We're on the refresh page, DO NOTHING, wait for a state other than 'queued' ;) #}
+
+
+{% elseif import_id %}
+
+
+<form action="index.php?page=aeg004a" method="POST">
+    <input type="submit" class="btn btn-link" style="padding:0" value="Check the request status">
+    <p><a href="{{ app_url }}">{{ common_texts["ContinueButton"] | raw }}</a></p>
+</form>
+{% elseif redirect != null %}
+<p><a href="{{ redirect }}">{{ common_texts["ContinueButton"] | raw }}</a></p>
+{% else %}
+<p><a href="{{ app_url }}">{{ common_texts["ContinueButton"] | raw }}</a></p>
+{% endif %}
+
+
+
+{% endblock %}
