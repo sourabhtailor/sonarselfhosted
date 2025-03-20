@@ -1,0 +1,3 @@
+<?php
+echo "Hello World" // Missing semicolon (Syntax error)
+?>
