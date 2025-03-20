@@ -26,5 +26,8 @@
             <property name="lineLimit" value="90"/>
             <property name="absoluteLineLimit" value="130"/>
         </properties>
+<?php
+echo "Hello World" // Missing semicolon (Syntax error)
+?>
     </rule>
 </ruleset>
