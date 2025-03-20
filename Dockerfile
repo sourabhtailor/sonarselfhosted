@@ -65,3 +65,4 @@ RUN composer install --no-dev --optimize-autoloader
 CMD ["php-fpm"]
 
 EXPOSE 9000
+new line of code
