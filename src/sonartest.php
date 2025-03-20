@@ -1,6 +1,7 @@
 <?php
-function testSonarQube() {
-    $unusedVar = "This variable is unused"; // This will be flagged
-    echo "Hello, world" // Syntax error: missing semicolon
-}
+// Security issue: Hardcoded password
+$password = "123456"; // SonarQube should flag this
+
+// Using an insecure function (MD5)
+$hash = md5("password"); // SonarQube flags this as a weak hash
 ?>
